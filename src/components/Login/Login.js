@@ -1,12 +1,25 @@
-import React, { useState, useRef } from 'react';
-import {  useNavigate } from 'react-router-dom';
+//login.js
+
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import sampleimg from './sampleimg.jpg';
 import './Login.css';
 import AuthService from '../../services/AuthService';
 
-function Login() {
+function Login({ isAuthenticated, setIsAuthenticated }) {
   const [showRegistrationOptions, setShowRegistrationOptions] = useState(false);
+  
   const navigate = useNavigate();
+  const authService = new AuthService();
+  const usernameRef = useRef(null);
+  const passwordRef = useRef(null);
+
+  useEffect(() => {
+    // If the user is already authenticated, redirect them to the home page
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleShowRegistrationOptions = () => {
     setShowRegistrationOptions(true);
@@ -20,9 +33,7 @@ function Login() {
       navigate('/UserRegistration'); 
     }
 };
-const authService = new AuthService();
-const usernameRef = useRef(null);
-  const passwordRef = useRef(null);
+
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +44,8 @@ const usernameRef = useRef(null);
     try {
       const token = await authService.login(email, password);
       console.log('Token:', token);
-      navigate('/RiderRegistration');
+      setIsAuthenticated(true);
+      navigate('/');
     } catch (error) {
       // Handle errors, such as displaying an error message to the user
       console.error('Login error:', error.message);
@@ -58,6 +70,11 @@ const usernameRef = useRef(null);
           <button className="Login" onClick={handleLoginSubmit}>
             Login
           </button>
+          {isAuthenticated && (
+        <div className="nav-links1">
+          <Link to="/">Logout</Link>
+        </div>
+        )}
           <br />
           <br />
 
